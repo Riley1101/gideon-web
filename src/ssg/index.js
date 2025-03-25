@@ -31,7 +31,6 @@ async function createDirectory(path) {
 
 async function writeFile(path, content) {
   try {
-    console.log(`Writing file to ${path}`);
     await Bun.write(path, content);
   } catch (error) {
     console.error("Error writing file", error);
@@ -99,11 +98,11 @@ export async function ssg(siteMap) {
       await writeFile(`${path}/index.html`, content);
     }
 
-    // const js = bundle["js"];
-    // if (js) {
-    //   console.log(`Generating SSR for asset ${js}`);
-    //   const jsContent = await getFile(js);
-    //   await writeFile(`${path}/index.js`, jsContent);
-    // }
+    const jsTemplate = bundle["js"];
+
+    if (jsTemplate) {
+      const jsContent = await getFile(`./${jsTemplate}`);
+      await writeFile(`${path}/index.js`, jsContent);
+    }
   }
 }
