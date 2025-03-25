@@ -1,4 +1,4 @@
-import { readdir, mkdir } from "node:fs/promises";
+import { readdir, mkdir, rm } from "node:fs/promises";
 import { fsRouter, getFile } from "../fs";
 import { buildTemplate } from "../template";
 
@@ -17,11 +17,14 @@ async function isDirectory(path) {
 async function createDirectory(path) {
   try {
     const isDir = await isDirectory(path);
-    if (!isDir) {
-      console.log("Creating build directory...");
-      await mkdir(DEFAULT_BUILD_DIR);
+    console.log("Creating build directory...");
+
+    if (isDir) {
+      await rm(path, { recursive: true, force: true });
       return true;
     }
+    await mkdir(DEFAULT_BUILD_DIR);
+
     return true;
   } catch (error) {
     console.error("Error creating build directory", error);
@@ -84,12 +87,6 @@ export async function ssg(siteMap) {
   for (const [name, bundle] of siteMap) {
     const dirHash = Bun.hash(name);
     const path = `${DEFAULT_BUILD_DIR}/${dirHash}`;
-    const createDir = await createDirectory(path);
-    if (!createDir) {
-      console.error("Error generating SSR for routel ", name);
-      return;
-    }
-
     console.log(`Generating SSR for route ${name}`);
     const htmlTemplate = bundle["html"];
     const html = await getFile(htmlTemplate);
