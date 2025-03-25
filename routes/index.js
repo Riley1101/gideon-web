@@ -1,7 +1,17 @@
-import { format } from "date-fns";
+const postElement = document.getElementById("posts");
 
-const date = document.getElementById("date");
+async function getPosts() {
+  return await fetch("https://jsonplaceholder.typicode.com/posts").then((res) =>
+    res.json(),
+  );
+}
 
-const d = format(new Date(2014, 1, 11), "yyyy-MM-dd");
+const posts = await getPosts();
 
-date.innerHTML = d;
+const lists = posts.map((post) => {
+  return `
+  <li>${post.title}</li>
+`;
+});
+
+postElement.innerHTML = lists.join("");
