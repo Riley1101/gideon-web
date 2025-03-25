@@ -108,7 +108,6 @@ export async function ssg(siteMap) {
 function buildRoute(requestRoute) {
   switch (requestRoute) {
     case "/":
-    case "/index.js":
       return "routes";
     default:
       return `routes${requestRoute}`;
@@ -117,7 +116,8 @@ function buildRoute(requestRoute) {
 export async function readSSGFiles(path) {
   const DEFAULT_META = `${DEFAULT_BUILD_DIR}/${DEFAULT_SITEMAP}`;
   const meta = await Bun.file(DEFAULT_META).json();
-  const resolvedPath = buildRoute(path);
+  // removed extensions
+  const resolvedPath = buildRoute(path.replace("/index.js", ""));
   const resolvedDir = meta[resolvedPath];
   if (!resolvedDir) {
     return;
