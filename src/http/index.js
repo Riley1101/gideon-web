@@ -1,5 +1,5 @@
 import { createRequestLogger } from "../logger";
-import { notFound, getTemplate } from "../template";
+import { notFound, getTemplate, getAsset } from "../template";
 
 /**
  * @param {string} requestRoute
@@ -61,7 +61,7 @@ async function fetchHandler(request, fs) {
       });
     }
 
-    const contents = await getTemplate(fsRoute);
+    const contents = await getAsset(fsRoute);
     return new Response(contents, {
       status: 200,
       headers: {
