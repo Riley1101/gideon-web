@@ -28,7 +28,6 @@ async function fetchHandler(request, fs) {
 
   const path = new URL(request.url);
   const route = buildRoute(path.pathname);
-
   const fsRoute = fs.get(route);
 
   if (!fsRoute) {
@@ -39,8 +38,8 @@ async function fetchHandler(request, fs) {
       },
     });
   }
-
-  return new Response(getTemplate(route), {
+  const contents = await getTemplate(fsRoute);
+  return new Response(contents, {
     status: 200,
     headers: {
       "Content-Type": "text/html",

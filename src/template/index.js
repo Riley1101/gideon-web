@@ -1,20 +1,9 @@
 /**
- * @param {string} route
+ * @param {import("../fs").RoutePath} route
  */
-export function getTemplate(route) {
-  return `
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Route</title>
-  </head>
-  <body>
-    <h1>${route}</h1>
-  </body>
-</html>
-`;
+export async function getTemplate(route) {
+  const contents = await Bun.file(route.originalPath).text();
+  return contents;
 }
 
 export function notFound() {
