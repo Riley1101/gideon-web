@@ -31,15 +31,34 @@ export function buildPath(path) {
   };
 }
 
+/**
+ * @returns Promise<{{ html: Map<string, RoutePath>, asset: Map<string, RoutePath> }}>
+ **/
 export async function fsRouter() {
-  const appDir = `${baseDir}/${routePath}`;
-  const routes = new Glob(appDir + "/**/*.html");
   const routeMap = new Map();
-  for await (const route of routes.scan(".")) {
+  const assetMap = new Map();
+
+  const appDir = `${baseDir}/${routePath}`;
+  const htmlFiles = new Glob(appDir + "/**/*.html");
+  const assetFiles = new Glob(appDir + "/**/*.{css,js}");
+
+  for await (const asset of assetFiles.scan(".")) {
+    const path = buildPath(asset);
+    if (path) {
+      const name = path.originalPath.slice(2);
+      assetMap.set(name, path);
+    }
+  }
+
+  for await (const route of htmlFiles.scan(".")) {
     const path = buildPath(route);
     if (path) {
       routeMap.set(path.name, path);
     }
   }
-  return routeMap;
+
+  return {
+    html: routeMap,
+    asset: assetMap,
+  };
 }
