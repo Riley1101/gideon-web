@@ -17,7 +17,7 @@ const baseTemplate = `
 </html>
 `;
 
-function buildTemplate(
+export function buildTemplate(
   body,
   head = defaultHead,
   importmaps = defaultImportMaps,

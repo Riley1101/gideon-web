@@ -32,6 +32,14 @@ export function buildPath(path) {
 }
 
 /**
+ * @param {string} path
+ */
+export async function getFile(path) {
+  const contents = await Bun.file(path).text();
+  return contents;
+}
+
+/**
  * @returns Promise<{{ html: Map<string, RoutePath>, asset: Map<string, RoutePath> }}>
  **/
 export async function fsRouter() {
