@@ -4,26 +4,31 @@ const defaultHead = `
   <title>Welcome</title>
 `;
 
-const defaultImportMaps = `
-  <script type="importmap">
-  </script>
-`;
-
 const baseTemplate = `
 <html lang="en">
   <--@head-->
   <--@body-->
+  <--@script-->
   <--@importmaps-->
 </html>
 `;
 
+const defaultScript = `
+  <script type="module" src="$$path"></script>
+`;
+
 export function buildTemplate(
   body,
+  scripts = "",
   head = defaultHead,
-  importmaps = defaultImportMaps,
+  importmaps = "",
 ) {
   return baseTemplate
     .replace("<--@head-->", head)
+    .replace(
+      "<--@script-->",
+      scripts !== "" ? defaultScript.replace("$$path", scripts) : "",
+    )
     .replace("<--@body-->", body)
     .replace("<--@importmaps-->", importmaps);
 }

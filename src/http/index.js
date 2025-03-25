@@ -1,5 +1,6 @@
 import { createRequestLogger } from "../logger";
 import { notFound, getTemplate, getAsset } from "../template";
+import { ssgHandler } from "../ssg";
 
 /**
  * @param {string} requestRoute
@@ -95,7 +96,7 @@ export async function createServer(config, fs) {
           "Content-Type": "image/x-icon",
         },
       }),
-      "/*": (req) => fetchHandler(req, fs),
+      "/*": (req) => ssgHandler(req),
     },
   });
 }
