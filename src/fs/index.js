@@ -1,6 +1,13 @@
 import { Glob } from "bun";
 
-const routePath = "./routes";
+/**
+ * @typedef {Object} RoutePath
+ * @property {string} originalPath - Original path
+ * @property {string} name - Name of the path
+ **/
+
+const baseDir = "./";
+const routePath = "routes";
 
 function isValidPath(_path) {
   // TODO! to check dynamic slug duplications
@@ -9,13 +16,14 @@ function isValidPath(_path) {
 
 /**
  * @param {string} path
+ * @returns {RoutePath | null}
  */
 export function buildPath(path) {
   if (!isValidPath(path)) {
     return null;
   }
 
-  let name = path.split("/").slice(0, -1).join("/");
+  let name = path.split("/").slice(1, -1).join("/");
 
   return {
     originalPath: path,
@@ -24,7 +32,8 @@ export function buildPath(path) {
 }
 
 export async function fsRouter() {
-  const routes = new Glob(routePath + "/**/*.html");
+  const appDir = `${baseDir}/${routePath}`;
+  const routes = new Glob(appDir + "/**/*.html");
   const routeMap = new Map();
   for await (const route of routes.scan(".")) {
     const path = buildPath(route);
