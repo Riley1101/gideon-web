@@ -7,9 +7,11 @@ const defaultHead = `
 const baseTemplate = `
 <html lang="en">
   <--@head-->
-  <--@body-->
-  <--@script-->
-  <--@importmaps-->
+  <body>
+    <--@body-->
+    <--@script-->
+    <--@importmaps-->
+  </body>
 </html>
 `;
 

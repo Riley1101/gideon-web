@@ -1,4 +1,5 @@
 import { readdir, mkdir, rm } from "node:fs/promises";
+import { createRequestLogger } from "../logger";
 import { fsRouter, getFile } from "../fs";
 import { buildTemplate } from "../template";
 
@@ -98,7 +99,6 @@ export async function ssg(siteMap) {
 
   // write  ssgMeta to json
   const obj = Object.fromEntries(ssgMeta);
-  console.log("Saving SSG Meta...");
   await writeFile(
     `${DEFAULT_BUILD_DIR}/${DEFAULT_SITEMAP}`,
     JSON.stringify(obj, null, 2),
@@ -132,6 +132,8 @@ export async function readSSGFiles(path) {
  * @param {Request} request
  */
 export async function ssgHandler(request) {
+  const logger = createRequestLogger(request);
+  logger.info("");
   const path = new URL(request.url);
   const isJs = path.pathname.endsWith(".js");
 
