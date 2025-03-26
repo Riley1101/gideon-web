@@ -1,6 +1,3 @@
-const postElement = document.getElementById("posts");
-import { format } from "date-fns";
-
 async function getPosts() {
   return await fetch("https://jsonplaceholder.typicode.com/posts").then((res) =>
     res.json(),
@@ -9,14 +6,15 @@ async function getPosts() {
 
 const posts = await getPosts();
 
-const lists = posts.map((post) => {
+const postsTemplate = posts.map((post) => {
   return `
   <div>
-    <p>${post.title}</p>
+    <h2>${post.title}</h2>
     <p>${post.body}</p>
-    <span>${format(new Date(), "yyyy-MM-dd")}</span>
   </div>
-`;
+  `;
 });
 
-postElement.innerHTML = lists.join("");
+export default {
+  posts: postsTemplate,
+};

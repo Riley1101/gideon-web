@@ -86,14 +86,21 @@ export async function ssg(siteMap) {
     const jsTemplate = bundle["js"];
 
     const html = await getFile(htmlTemplate);
-    if (html) {
-      const jsPath = jsTemplate ?? "";
-      const content = buildTemplate(html, jsPath.replace("routes/", ""));
-      await writeFile(`${path}/index.html`, content);
-    }
+
     if (jsTemplate) {
+      const jsPath = `${path}/index.js`;
       const jsContent = await getFile(`./${jsTemplate}`);
-      await writeFile(`${path}/index.js`, jsContent);
+      await writeFile(jsPath, jsContent);
+
+      const modulePath= `${jsPath}`;
+
+      console.log(modulePath);
+    }
+
+    if (html) {
+      const htmlPath = jsTemplate ?? "";
+      const content = buildTemplate(html, htmlPath.replace("routes/", ""));
+      await writeFile(`${path}/index.html`, content);
     }
   }
 
