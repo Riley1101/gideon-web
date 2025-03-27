@@ -1,5 +1,3 @@
-import { createLanguageService } from "typescript";
-
 const defaultHead = `
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -22,16 +20,21 @@ const defaultScript = `
 `;
 
 export class TemplateBuilder {
-  constructor(content) {
-    this.contents = content || "";
+  constructor() {
+    this.contents = baseTemplate;
   }
 
   getTemplate() {
     return this.contents;
   }
 
-  withHead(head) {
+  withHead(head = defaultHead) {
     this.contents = baseTemplate.replace("<--@head-->", head);
+    return this;
+  }
+
+  withBody(body) {
+    this.contents = this.contents.replace("<--@body-->", body);
     return this;
   }
 
@@ -96,27 +99,6 @@ export async function getTemplate(route) {
 export async function getAsset(route) {
   const contents = await Bun.file(route.originalPath).text();
   return contents;
-}
-
-/**
- * @param {import("../fs").RoutePath} route
- */
-export async function getApp(route) {
-  return `
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>App</title>
-  </head>
-  <body>
-    <h1>
-      ${route.name}
-    </h1>
-  </body>
-</html>
-  `;
 }
 
 export function notFound() {

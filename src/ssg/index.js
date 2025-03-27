@@ -79,34 +79,40 @@ export async function ssg(siteMap) {
   for (const [name, bundle] of siteMap) {
     const dirHash = Bun.hash(name);
     ssgMeta.set(name, dirHash.toString());
-    const path = `${DEFAULT_BUILD_DIR}/${dirHash}`;
+    const hashPath = `${DEFAULT_BUILD_DIR}/${dirHash}`;
     console.log(`Generating SSR for route ${name}`);
 
-    const htmlTemplate = bundle["html"];
-    const jsTemplate = bundle["js"];
+    const htmlPath = bundle["html"];
+    const jsRawPath = bundle["js"];
+    const html = await getFile(htmlPath);
 
-    const html = await getFile(htmlTemplate);
+    const jsPath = `${hashPath}/index.js`;
 
-    if (jsTemplate) {
-      try {
-        const jsPath = `${path}/index.js`;
-        const jsContent = await getFile(`./${jsTemplate}`);
-        await writeFile(jsPath, jsContent);
-        const pwd = Bun.main.replace("index.js", "");
-        const modulePath = `${pwd}${jsPath}`;
-        const module = await import(modulePath);
-        if (html) {
-          const jsScript = jsTemplate.replace("routes/", "") ?? "";
-          const content = buildTemplate(html, jsScript);
-          const template = new TemplateBuilder(content);
+    if (jsRawPath) {
+      const jsContent = await getFile(`./${jsRawPath}`);
+      await writeFile(jsPath, jsContent);
+    }
+
+    try {
+      if (html) {
+        const template = new TemplateBuilder();
+        template.withHead();
+        template.withBody(html);
+
+        if (jsRawPath) {
+          const pwd = Bun.main.replace("index.js", "");
+          const modulePath = `${pwd}${jsPath}`;
+          const module = await import(modulePath);
+          const jsScript = jsRawPath.replace("routes/", "") ?? "";
           template.withScript(jsScript);
           template.withData(module);
-          const result = template.build();
-          await writeFile(`${path}/index.html`, result);
         }
-      } catch (error) {
-        console.error(error);
+
+        const result = template.build();
+        await writeFile(`${hashPath}/index.html`, result);
       }
+    } catch (error) {
+      console.error(error);
     }
   }
 
