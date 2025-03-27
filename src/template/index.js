@@ -1,10 +1,15 @@
+import { injectHMR } from "../hmr";
+
 const defaultHead = `
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Welcome</title>
 `;
 
-const baseTemplate = `
+const baseTemplate = () => {
+  const isProd = process.env.NODE_ENV === "production";
+  if (isProd) {
+    return `
 <html lang="en">
   <--@head-->
   <body>
@@ -14,6 +19,19 @@ const baseTemplate = `
   </body>
 </html>
 `;
+  }
+  return `
+<html lang="en">
+  <--@head-->
+  <body>
+    <--@body-->
+    <--@importmaps-->
+    <--@script-->
+    ${injectHMR()}
+  </body>
+</html>
+`;
+};
 
 const defaultScript = `
   <script type="module" src="$$path"></script>
@@ -21,7 +39,7 @@ const defaultScript = `
 
 export class TemplateBuilder {
   constructor() {
-    this.contents = baseTemplate;
+    this.contents = baseTemplate();
   }
 
   getTemplate() {
@@ -29,7 +47,7 @@ export class TemplateBuilder {
   }
 
   withHead(head = defaultHead) {
-    this.contents = baseTemplate.replace("<--@head-->", head);
+    this.contents = this.contents.replace("<--@head-->", head);
     return this;
   }
 

@@ -50,6 +50,11 @@ async function writeFile(path, content) {
  *
  * @typedef {Map<string, RouteBundle>} RouteBundleMap
  */
+
+/**
+ * @description Generate static siteMap
+ * @param {import("../config").AppConfig} config
+ */
 export async function generate() {
   const defaultBuildDir = ".gideon";
   const buildDir = await createDirectory(defaultBuildDir);
