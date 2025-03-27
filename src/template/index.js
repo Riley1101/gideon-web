@@ -9,8 +9,8 @@ const baseTemplate = `
   <--@head-->
   <body>
     <--@body-->
-    <--@script-->
     <--@importmaps-->
+    <--@script-->
   </body>
 </html>
 `;
@@ -60,37 +60,16 @@ export class TemplateBuilder {
   }
 
   withImportmaps(importmaps) {
-    this.contents = this.contents.replace("<--@importmaps-->", importmaps);
+    this.contents = this.contents.replace(
+      "<--@importmaps-->",
+      importmaps || "",
+    );
     return this;
   }
 
   build() {
     return this.contents;
   }
-}
-
-export function buildTemplate(
-  body,
-  scripts = "",
-  head = defaultHead,
-  importmaps = "",
-) {
-  return baseTemplate
-    .replace("<--@head-->", head)
-    .replace(
-      "<--@script-->",
-      scripts !== "" ? defaultScript.replace("$$path", scripts) : "",
-    )
-    .replace("<--@body-->", body)
-    .replace("<--@importmaps-->", importmaps);
-}
-
-/**
- * @param {import("../fs").RoutePath} route
- */
-export async function getTemplate(route) {
-  const contents = await Bun.file(route.originalPath).text();
-  return buildTemplate(contents);
 }
 
 /**

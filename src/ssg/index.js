@@ -1,7 +1,7 @@
 import { readdir, mkdir, rm } from "node:fs/promises";
 import { createRequestLogger } from "../logger";
 import { fsRouter, getFile } from "../fs";
-import { buildTemplate, TemplateBuilder } from "../template";
+import { TemplateBuilder } from "../template";
 
 const DEFAULT_BUILD_DIR = ".gideon";
 const DEFAULT_SITEMAP = "siteMap.json";
@@ -98,6 +98,7 @@ export async function ssg(siteMap) {
         const template = new TemplateBuilder();
         template.withHead();
         template.withBody(html);
+        template.withImportmaps();
 
         if (jsRawPath) {
           const pwd = Bun.main.replace("index.js", "");
@@ -106,6 +107,9 @@ export async function ssg(siteMap) {
           const jsScript = jsRawPath.replace("routes/", "") ?? "";
           template.withScript(jsScript);
           template.withData(module);
+        }
+        if (!jsRawPath) {
+          template.withScript("");
         }
 
         const result = template.build();
