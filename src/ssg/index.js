@@ -1,7 +1,7 @@
 import { readdir, mkdir, rm } from "node:fs/promises";
 import { createRequestLogger } from "../logger";
 import { fsRouter, getFile } from "../fs";
-import { buildTemplate } from "../template";
+import { buildTemplate, TemplateBuilder } from "../template";
 
 const DEFAULT_BUILD_DIR = ".gideon";
 const DEFAULT_SITEMAP = "siteMap.json";
@@ -88,19 +88,25 @@ export async function ssg(siteMap) {
     const html = await getFile(htmlTemplate);
 
     if (jsTemplate) {
-      const jsPath = `${path}/index.js`;
-      const jsContent = await getFile(`./${jsTemplate}`);
-      await writeFile(jsPath, jsContent);
-
-      const modulePath= `${jsPath}`;
-
-      console.log(modulePath);
-    }
-
-    if (html) {
-      const htmlPath = jsTemplate ?? "";
-      const content = buildTemplate(html, htmlPath.replace("routes/", ""));
-      await writeFile(`${path}/index.html`, content);
+      try {
+        const jsPath = `${path}/index.js`;
+        const jsContent = await getFile(`./${jsTemplate}`);
+        await writeFile(jsPath, jsContent);
+        const pwd = Bun.main.replace("index.js", "");
+        const modulePath = `${pwd}${jsPath}`;
+        const module = await import(modulePath);
+        if (html) {
+          const jsScript = jsTemplate.replace("routes/", "") ?? "";
+          const content = buildTemplate(html, jsScript);
+          const template = new TemplateBuilder(content);
+          template.withScript(jsScript);
+          template.withData(module);
+          const result = template.build();
+          await writeFile(`${path}/index.html`, result);
+        }
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 

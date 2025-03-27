@@ -16,5 +16,5 @@ const postsTemplate = posts.map((post) => {
 });
 
 export default {
-  posts: postsTemplate,
+  title: "Posts",
 };

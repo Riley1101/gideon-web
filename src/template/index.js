@@ -1,3 +1,5 @@
+import { createLanguageService } from "typescript";
+
 const defaultHead = `
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,6 +20,51 @@ const baseTemplate = `
 const defaultScript = `
   <script type="module" src="$$path"></script>
 `;
+
+export class TemplateBuilder {
+  constructor(content) {
+    this.contents = content || "";
+  }
+
+  getTemplate() {
+    return this.contents;
+  }
+
+  withHead(head) {
+    this.contents = baseTemplate.replace("<--@head-->", head);
+    return this;
+  }
+
+  withData(data) {
+    if (!data.default) {
+      return this;
+    }
+    const { default: module } = data;
+    let tmp = this.contents;
+    for (const key in module) {
+      tmp = tmp.replace(`@${key}`, module[key]);
+    }
+    this.contents = tmp;
+    return this;
+  }
+
+  withScript(script) {
+    this.contents = this.contents.replace(
+      "<--@script-->",
+      script !== "" ? defaultScript.replace("$$path", script) : "",
+    );
+    return this;
+  }
+
+  withImportmaps(importmaps) {
+    this.contents = this.contents.replace("<--@importmaps-->", importmaps);
+    return this;
+  }
+
+  build() {
+    return this.contents;
+  }
+}
 
 export function buildTemplate(
   body,
