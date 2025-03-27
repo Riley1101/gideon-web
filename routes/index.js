@@ -16,6 +16,9 @@ const postsTemplate = posts.map((post) => {
 });
 
 export default {
-  title: "Posts",
+  title: "Articles",
   posts: postsTemplate.join(""),
+  apple: "orange",
+  apple3: "orange",
+  apple2: "orange",
 };

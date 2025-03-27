@@ -15,13 +15,17 @@ async function isDirectory(path) {
   }
 }
 
+export function createBuildDir() {
+  return createDirectory(DEFAULT_BUILD_DIR);
+}
+
 async function createDirectory(path) {
   try {
     const isDir = await isDirectory(path);
     console.log("Creating build directory...");
 
     if (isDir) {
-      await rm(path, { recursive: true, force: true });
+      await rm(path, { recursive: true }, { force: true });
       return true;
     }
     await mkdir(DEFAULT_BUILD_DIR);
@@ -56,12 +60,6 @@ async function writeFile(path, content) {
  * @param {import("../config").AppConfig} config
  */
 export async function generate() {
-  const defaultBuildDir = ".gideon";
-  const buildDir = await createDirectory(defaultBuildDir);
-  if (!buildDir) {
-    console.error("Error creating build directory");
-    return;
-  }
   const { html, asset } = await fsRouter();
   const siteMap = new Map();
 
@@ -127,10 +125,9 @@ export async function ssg(siteMap) {
 
   // write  ssgMeta to json
   const obj = Object.fromEntries(ssgMeta);
-  await writeFile(
-    `${DEFAULT_BUILD_DIR}/${DEFAULT_SITEMAP}`,
-    JSON.stringify(obj, null, 2),
-  );
+  const siteMapPath = `${DEFAULT_BUILD_DIR}/${DEFAULT_SITEMAP}`;
+  // if exists delete
+  await writeFile(siteMapPath, JSON.stringify(obj, null, 2));
 }
 
 function buildRoute(requestRoute) {
