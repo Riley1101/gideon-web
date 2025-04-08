@@ -25,9 +25,10 @@ export async function startHMR(req, server) {
 export async function watchChanges(config) {
   const baseDir = fileURLToPath(import.meta.url);
   const rootDir = path.dirname(path.dirname(path.dirname(baseDir)));
+  const watchDir = `${rootDir}/${config.routeDir}`;
 
-  console.log(`Watching for changes in ${rootDir}`);
-  const watcher = watch(rootDir, { recursive: true });
+  console.log(`Watching for changes in ${watchDir}`);
+  const watcher = watch(watchDir, { recursive: true });
   for await (const event of watcher) {
     switch (event.eventType) {
       case "rename":
@@ -47,7 +48,7 @@ export function injectHMR() {
     const ws = new WebSocket("ws://localhost:3000/__hmr");
     ws.onmessage = (event) => {
       if (event.data === "reload") {
-        window.location.reload();
+        window.location.reload(true);
       }
     };
   </script>
